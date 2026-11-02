@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+  <title>DORIAN CONTROL · OAuth Callback</title>
+  <style>
+    body{font-family:system-ui,Segoe UI,Arial,sans-serif;background:#111827;color:#f3f4f6;margin:0;padding:40px}
+    .box{max-width:760px;margin:auto;background:#1f2937;padding:28px;border-radius:16px}
+    textarea{width:100%;min-height:140px;background:#0f172a;color:#e5e7eb;border:1px solid #475569;border-radius:10px;padding:12px;box-sizing:border-box}
+    button{padding:12px 18px;border:0;border-radius:10px;cursor:pointer;font-weight:700}
+    .ok{color:#86efac}.warn{color:#fbbf24}.muted{color:#94a3b8}
+  </style>
+</head>
+<body>
+<div class="box">
+  <h1>DORIAN CONTROL</h1>
+  <p id="status" class="warn">Procesando retorno de Mercado Libre…</p>
+  <p>Copiá la URL completa y pegala en <b>DORIAN CONTROL → Mercado Libre → Conexión segura</b>.</p>
+  <textarea id="url" readonly></textarea>
+  <p><button id="copy">Copiar URL completa</button></p>
+  <p class="muted">Esta página no envía el código a ningún servicio mediante JavaScript. El intercambio por tokens se realiza localmente en DORIAN CONTROL.</p>
+</div>
+<script>
+  const full = window.location.href;
+  document.getElementById("url").value = full;
+  const q = new URLSearchParams(window.location.search);
+  const status = document.getElementById("status");
+  if(q.get("code") && q.get("state")){
+    status.textContent = "Autorización recibida. Volvé a DORIAN CONTROL.";
+    status.className = "ok";
+  } else if(q.get("error")){
+    status.textContent = "Mercado Libre devolvió un error: " + q.get("error");
+    status.className = "warn";
+  } else {
+    status.textContent = "Esta página está lista como callback OAuth.";
+  }
+  document.getElementById("copy").onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(full);
+      document.getElementById("copy").textContent = "Copiado";
+    } catch(e) {
+      document.getElementById("url").select();
+      document.execCommand("copy");
+    }
+  };
+</script>
+</body>
+</html>
